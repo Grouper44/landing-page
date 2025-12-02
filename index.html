@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>原萃 - 真實茶韻</title>
+
+    <!-- 網頁 Icon (Favicon) -->
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍃</text></svg>">
+
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* 自定義動畫樣式 */
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(30px, -50px) rotate(120deg);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) rotate(240deg);
+            }
+
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+        @keyframes float-fast {
+            0% {
+                transform: translateY(0);
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fade-in-up {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin-slow {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .animate-float {
+            animation: float infinite linear;
+        }
+
+        .animate-float-fast {
+            animation: float-fast 2s infinite ease-out;
+        }
+
+        .animate-fade-in-up {
+            animation: fade-in-up 0.8s ease-out forwards;
+        }
+
+        .animate-spin-slow {
+            animation: spin-slow 8s linear infinite;
+        }
+
+        .delay-100 {
+            animation-delay: 100ms;
+        }
+
+        .delay-200 {
+            animation-delay: 200ms;
+        }
+
+        .delay-300 {
+            animation-delay: 300ms;
+        }
+
+        .delay-500 {
+            animation-delay: 500ms;
+        }
+
+        /* Modal 動畫 */
+        .modal-enter {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        .modal-enter-active {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 300ms, transform 300ms;
+        }
+
+        .modal-exit {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .modal-exit-active {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 200ms, transform 200ms;
+        }
+
+        /* 光暈效果 */
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body class="font-sans text-gray-800 antialiased overflow-x-hidden selection:bg-green-200">
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 bg-transparent py-5">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="scrollToSection('hero')">
+                <div
+                    class="w-8 h-8 bg-green-700 rounded-lg flex items-center justify-center text-white font-bold text-xl">
+                    原</div>
+                <span id="brand-text" class="text-2xl font-bold tracking-widest text-white">原萃</span>
+            </div>
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex space-x-8 items-center">
+                <button onclick="scrollToSection('features')"
+                    class="nav-link text-white/90 text-sm font-medium hover:text-green-500 transition-colors">雲霧工法</button>
+                <button onclick="scrollToSection('products')"
+                    class="nav-link text-white/90 text-sm font-medium hover:text-green-500 transition-colors">系列產品</button>
+                <button onclick="scrollToSection('footer')"
+                    class="nav-link text-white/90 text-sm font-medium hover:text-green-500 transition-colors">聯絡我們</button>
+
+                <button onclick="openBuyModal()"
+                    class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full text-sm font-bold transition-transform transform hover:scale-105 shadow-lg flex items-center gap-2">
+                    <i data-lucide="shopping-bag" width="16"></i> 立即購買
+                </button>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden">
+                <button id="menu-btn" class="text-white">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu"
+            class="hidden absolute top-full left-0 w-full bg-white shadow-xl py-4 flex flex-col items-center space-y-4">
+            <button onclick="scrollToSection('features')"
+                class="text-gray-800 font-medium hover:text-green-600">雲霧工法</button>
+            <button onclick="scrollToSection('products')"
+                class="text-gray-800 font-medium hover:text-green-600">系列產品</button>
+            <button onclick="openBuyModal()"
+                class="text-green-700 font-bold hover:text-green-900 flex items-center gap-2">
+                <i data-lucide="shopping-bag" width="16"></i> 立即購買
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header id="hero" class="relative min-h-screen w-full overflow-hidden flex items-center justify-center pt-20 pb-10">
+        <!-- 1. Layer: Background Gradient -->
+        <div class="absolute inset-0 bg-gradient-to-br from-green-800 via-green-600 to-emerald-400 z-0">
+            <!-- 2. Layer: Floating Leaves -->
+            <div id="leaves-container" class="absolute inset-0 opacity-20"></div>
+        </div>
+
+        <!-- 3. Layer: The Bottle Image (Background Decoration) -->
+        <div class="absolute inset-0 flex items-center justify-center z-0 overflow-hidden pointer-events-none">
+            <!-- 使用 mix-blend-overlay 或 multiply 讓圖片融入背景，並設定旋轉 -->
+            <img src="Adobe Express - file.png" alt="Background Bottle"
+                class="w-[80vh] md:w-[60vh] opacity-40 mix-blend-overlay rotate-45 transform translate-x-20 md:translate-x-40 blur-[1px]">
+        </div>
+
+        <!-- 4. Layer: Dark Overlay for text readability -->
+        <div class="absolute inset-0 bg-black/10 z-0"></div>
+
+        <!-- 5. Layer: Content -->
+        <div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
+            <div
+                class="inline-block mb-4 px-4 py-1 border border-white/50 rounded-full text-white/80 text-sm tracking-widest backdrop-blur-sm animate-fade-in-up">
+                真實茶韻 · 絕無香料
+            </div>
+            <h1
+                class="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight tracking-tight drop-shadow-lg animate-fade-in-up delay-100">
+                一層甘甜，<br class="md:hidden" />兩層好茶
+            </h1>
+            <p class="text-xl md:text-2xl text-green-50 mb-8 font-light max-w-2xl mx-auto animate-fade-in-up delay-200">
+                獨特雲霧工法，保留茶葉精華。<br />喝得到的真實，搖一搖更甘甜。
+            </p>
+
+            <!-- Hero Email Subscription Form -->
+            <form onsubmit="handleHeroSubscribe(event)"
+                class="w-full max-w-lg mx-auto mb-10 animate-fade-in-up delay-300 relative z-20">
+                <div
+                    class="flex flex-col sm:flex-row gap-3 p-2 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 shadow-2xl glow-effect">
+                    <div class="relative flex-1">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-white/60">
+                            <i data-lucide="mail" width="20"></i>
+                        </div>
+                        <input type="email" id="hero-email" required placeholder="輸入 Email 領取 9 折優惠碼"
+                            class="w-full pl-12 pr-4 py-4 rounded-2xl bg-transparent text-white placeholder-white/70 focus:outline-none focus:bg-white/10 transition-all text-lg border-none ring-0">
+                    </div>
+                    <button type="submit" id="hero-submit-btn"
+                        class="px-8 py-4 rounded-2xl bg-yellow-400 hover:bg-yellow-300 text-green-900 font-bold text-lg shadow-lg transition-all transform hover:scale-105 flex items-center justify-center gap-2 whitespace-nowrap min-w-[140px]">
+                        <span>立即訂閱</span>
+                    </button>
+                </div>
+                <p class="text-green-100/80 text-sm mt-3 font-light tracking-wide">
+                    <i data-lucide="gift" width="14" class="inline mb-1 mr-1"></i>
+                    已有 <span id="sub-count" class="font-bold text-white">12,504</span> 人訂閱獲得優惠
+                </p>
+            </form>
+
+            <div class="flex flex-col md:flex-row gap-4 justify-center items-center animate-fade-in-up delay-500">
+                <button onclick="scrollToSection('features')"
+                    class="bg-white/90 backdrop-blur text-green-800 px-8 py-3 rounded-full font-bold text-lg hover:bg-white transition-all hover:shadow-xl transform hover:-translate-y-1 flex items-center gap-2">
+                    <i data-lucide="rotate-cw" class="animate-spin-slow"></i> 探索雲霧工法
+                </button>
+                <button onclick="scrollToSection('products')"
+                    class="border-2 border-white/70 text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-white/20 hover:border-white transition-all">
+                    查看全系列
+                </button>
+            </div>
+        </div>
+
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white animate-bounce">
+            <i data-lucide="chevron-down" width="32"></i>
+        </div>
+    </header>
+
+    <!-- Cloud Mist Method Feature Section -->
+    <section id="features" class="py-24 bg-white relative overflow-hidden">
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-green-900 mb-4">什麼是「雲霧工法」？</h2>
+                <div class="w-16 h-1 bg-green-500 mx-auto rounded-full mb-6"></div>
+                <p class="text-gray-600 max-w-2xl mx-auto text-lg">
+                    原萃好喝的秘密，在於將茶葉極細研磨，融入茶湯之中。
+                    <br />那層看似沈澱的雲霧，其實就是茶葉最精華的甘甜來源。
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-10">
+                <!-- Step 1 -->
+                <div
+                    class="group bg-green-50 p-8 rounded-3xl text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-default">
+                    <div
+                        class="w-20 h-20 bg-green-200 rounded-full flex items-center justify-center mx-auto mb-6 text-green-700 group-hover:scale-110 transition-transform">
+                        <i data-lucide="leaf" width="40" height="40"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-green-900 mb-3">嚴選茶葉</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        堅持100%無香料，嚴選優質茶葉，保留最原始的大自然香氣。
+                    </p>
+                </div>
+
+                <!-- Step 2 -->
+                <div
+                    class="group bg-green-50 p-8 rounded-3xl text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-default relative">
+                    <div
+                        class="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl rounded-tr-3xl">
+                        核心技術</div>
+                    <div
+                        class="w-20 h-20 bg-green-200 rounded-full flex items-center justify-center mx-auto mb-6 text-green-700 group-hover:scale-110 transition-transform">
+                        <i data-lucide="rotate-cw" width="40" height="40"
+                            class="group-hover:rotate-180 transition-transform duration-700"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-green-900 mb-3">細磨與萃取</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        獨特雲霧工法，將茶葉細磨後融入茶湯，釋放茶葉深層的甘甜。
+                    </p>
+                </div>
+
+                <!-- Step 3 -->
+                <div
+                    class="group bg-green-50 p-8 rounded-3xl text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-default">
+                    <div
+                        class="w-20 h-20 bg-green-200 rounded-full flex items-center justify-center mx-auto mb-6 text-green-700 group-hover:scale-110 transition-transform">
+                        <i data-lucide="droplets" width="40" height="40"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-green-900 mb-3">搖勻釋放</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        喝之前搖一搖，讓茶葉精華與茶湯完美融合，口感層次更豐富。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Shake Demo Section -->
+    <section class="py-20 bg-green-900 text-white relative overflow-hidden">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row items-center justify-center gap-12">
+            <div class="md:w-1/2 text-center md:text-left">
+                <h2 class="text-3xl md:text-5xl font-bold mb-6">搖一搖，<br />喚醒茶的靈魂</h2>
+                <p class="text-green-100 text-lg mb-8 leading-relaxed">
+                    看見瓶底的沈澱了嗎？那不是雜質，那是我們引以為傲的微研磨茶粉。<br />
+                    輕輕搖晃，讓雲霧散開，這就是回甘的秘密。
+                </p>
+                <div class="flex flex-col items-center md:items-start gap-4">
+                    <div class="flex items-center gap-4 text-sm font-bold tracking-widest uppercase text-green-300">
+                        <span class="w-12 h-[1px] bg-green-300"></span>
+                        Shake It
+                        <span class="w-12 h-[1px] bg-green-300"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottle Visual -->
+            <div class="md:w-1/2 flex justify-center">
+                <div class="relative group cursor-pointer w-48 h-[400px]">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-yellow-100 to-green-200 rounded-t-[40px] rounded-b-[20px] opacity-80 border-4 border-white/20 backdrop-blur-sm overflow-hidden transform transition-transform duration-500 group-hover:rotate-12 group-active:rotate-[20deg] shadow-2xl">
+                        <div
+                            class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-green-700 to-green-500 h-[85%] w-full transition-all duration-1000 group-hover:h-[80%] rounded-b-[15px]">
+                            <div
+                                class="absolute bottom-0 w-full h-20 bg-green-800 blur-xl opacity-80 group-hover:opacity-0 transition-opacity duration-700">
+                            </div>
+                            <div id="particles-container"></div>
+                        </div>
+                        <div
+                            class="absolute top-1/3 left-0 right-0 h-24 bg-white/90 flex flex-col items-center justify-center">
+                            <span class="text-green-900 font-bold text-xl">原萃</span>
+                            <span class="text-green-700 text-xs">日式綠茶</span>
+                        </div>
+                    </div>
+                    <div
+                        class="absolute -top-4 left-1/2 transform -translate-x-1/2 w-16 h-8 bg-green-800 rounded-t-lg border-b-2 border-white/20">
+                    </div>
+                    <div
+                        class="absolute -right-12 top-1/2 animate-bounce bg-white text-green-800 px-3 py-1 rounded-lg text-sm font-bold shadow-lg">
+                        試著碰我！
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Product Showcase -->
+    <section id="products" class="py-24 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">系列產品</h2>
+                <p class="text-gray-600">滿足不同喜好的挑剔味蕾</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Product 1: Green Tea -->
+                <div
+                    class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 group">
+                    <div class="bg-green-100 h-64 flex items-center justify-center relative overflow-hidden">
+                        <div
+                            class="text-9xl transform group-hover:scale-110 transition-transform duration-500 cursor-default select-none">
+                            🍵</div>
+                        <div
+                            class="absolute inset-0 bg-green-600 opacity-0 group-hover:opacity-90 transition-opacity duration-300 flex items-center justify-center p-6 text-center">
+                            <p
+                                class="text-white font-medium text-lg leading-relaxed transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                100% 無香料，甘甜來自真實茶葉</p>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-bold mb-2 text-green-800">日式綠茶</h3>
+                        <button onclick="openProductModal('green-tea')"
+                            class="mt-2 text-sm font-bold uppercase tracking-wide py-2 px-6 rounded-full border text-green-800 border-current hover:bg-gray-50 transition-colors">了解更多</button>
+                    </div>
+                </div>
+
+                <!-- Product 2: Pouchong -->
+                <div
+                    class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 group">
+                    <div class="bg-teal-100 h-64 flex items-center justify-center relative overflow-hidden">
+                        <div
+                            class="text-9xl transform group-hover:scale-110 transition-transform duration-500 cursor-default select-none">
+                            🌱</div>
+                        <div
+                            class="absolute inset-0 bg-teal-600 opacity-0 group-hover:opacity-90 transition-opacity duration-300 flex items-center justify-center p-6 text-center">
+                            <p
+                                class="text-white font-medium text-lg leading-relaxed transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                優雅清香，回甘不苦澀</p>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-bold mb-2 text-teal-800">文山包種</h3>
+                        <button onclick="openProductModal('pouchong')"
+                            class="mt-2 text-sm font-bold uppercase tracking-wide py-2 px-6 rounded-full border text-teal-800 border-current hover:bg-gray-50 transition-colors">了解更多</button>
+                    </div>
+                </div>
+
+                <!-- Product 3: Black Tea -->
+                <div
+                    class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 group">
+                    <div class="bg-red-100 h-64 flex items-center justify-center relative overflow-hidden">
+                        <div
+                            class="text-9xl transform group-hover:scale-110 transition-transform duration-500 cursor-default select-none">
+                            🍂</div>
+                        <div
+                            class="absolute inset-0 bg-red-700 opacity-0 group-hover:opacity-90 transition-opacity duration-300 flex items-center justify-center p-6 text-center">
+                            <p
+                                class="text-white font-medium text-lg leading-relaxed transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                嚴選高地紅茶，醇厚順口</p>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-bold mb-2 text-red-800">錫蘭無糖紅茶</h3>
+                        <button onclick="openProductModal('black-tea')"
+                            class="mt-2 text-sm font-bold uppercase tracking-wide py-2 px-6 rounded-full border text-red-800 border-current hover:bg-gray-50 transition-colors">了解更多</button>
+                    </div>
+                </div>
+
+                <!-- Product 4: Tieguanyin -->
+                <div
+                    class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 group">
+                    <div class="bg-amber-100 h-64 flex items-center justify-center relative overflow-hidden">
+                        <div
+                            class="text-9xl transform group-hover:scale-110 transition-transform duration-500 cursor-default select-none">
+                            🏺</div>
+                        <div
+                            class="absolute inset-0 bg-amber-800 opacity-0 group-hover:opacity-90 transition-opacity duration-300 flex items-center justify-center p-6 text-center">
+                            <p
+                                class="text-white font-medium text-lg leading-relaxed transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                深焙香氣，層次豐富</p>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-bold mb-2 text-amber-900">鐵觀音</h3>
+                        <button onclick="openProductModal('tieguanyin')"
+                            class="mt-2 text-sm font-bold uppercase tracking-wide py-2 px-6 rounded-full border text-amber-900 border-current hover:bg-gray-50 transition-colors">了解更多</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer" class="bg-gray-900 text-gray-400 py-12">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-gray-800 pb-8">
+                <div class="text-2xl font-bold text-white mb-4 md:mb-0">
+                    原萃<span class="text-green-500">.</span>
+                </div>
+                <div class="flex space-x-6">
+                    <!-- 在這裡修改 href 內的網址 -->
+                    <a href="https://www.facebook.com/RealLeafTaiwan/?locale=zh_TW" target="_blank"
+                        class="hover:text-white transition-colors"><i data-lucide="facebook" width="20"></i></a>
+                    <a href="https://www.instagram.com/realleaf.tw/" target="_blank"
+                        class="hover:text-white transition-colors"><i data-lucide="instagram" width="20"></i></a>
+                </div>
+            </div>
+            <div class="text-center text-xs">
+                <p>&copy; 2025 文山包種茶股份有限公司. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Product Details Modal -->
+    <div id="product-modal" class="fixed inset-0 z-[60] hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeProductModal()"></div>
+        <div class="relative min-h-screen md:min-h-0 flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden transform transition-all scale-95 opacity-0"
+                id="product-modal-content">
+                <div class="flex flex-col md:flex-row">
+                    <div class="md:w-2/5 h-64 md:h-auto flex items-center justify-center p-8" id="modal-color-bg">
+                        <div class="text-8xl" id="modal-icon">🍵</div>
+                    </div>
+                    <div class="md:w-3/5 p-8 md:p-10 relative">
+                        <button onclick="closeProductModal()"
+                            class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors">
+                            <i data-lucide="x" width="24"></i>
+                        </button>
+                        <h3 class="text-2xl font-bold mb-2" id="modal-title">產品名稱</h3>
+                        <p class="text-sm font-bold text-gray-500 mb-6 uppercase tracking-wider" id="modal-subtitle">無糖
+                            · 無香料</p>
+
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-900 mb-1">風味描述</h4>
+                                <p class="text-gray-600 leading-relaxed text-sm" id="modal-desc">風味描述文字</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-xl">
+                                <h4 class="text-xs font-bold text-gray-500 mb-2 uppercase">產品特色</h4>
+                                <ul class="space-y-2 text-sm text-gray-700">
+                                    <li class="flex items-start gap-2"><i data-lucide="check" width="16"
+                                            class="text-green-600 mt-0.5 shrink-0"></i> <span>100% 真實茶葉萃取</span></li>
+                                    <li class="flex items-start gap-2"><i data-lucide="check" width="16"
+                                            class="text-green-600 mt-0.5 shrink-0"></i> <span>雲霧工法，保留甘甜</span></li>
+                                    <li class="flex items-start gap-2"><i data-lucide="check" width="16"
+                                            class="text-green-600 mt-0.5 shrink-0"></i> <span>0 卡路里，清爽無負擔</span></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 flex gap-3">
+                            <button onclick="openBuyModal(); closeProductModal();"
+                                class="flex-1 bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                                立即購買 <i data-lucide="arrow-right" width="16"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buy/Email Modal -->
+    <div id="buy-modal" class="fixed inset-0 z-[70] hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeBuyModal()"></div>
+        <div class="relative min-h-screen md:min-h-0 flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 transform transition-all scale-95 opacity-0"
+                id="buy-modal-content">
+                <button onclick="closeBuyModal()"
+                    class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors">
+                    <i data-lucide="x" width="24"></i>
+                </button>
+
+                <div class="text-center mb-8">
+                    <div
+                        class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="shopping-bag" width="32"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900">立即購買 / 訂閱優惠</h3>
+                    <p class="text-gray-500 mt-2">請確認您的訂閱資訊</p>
+                </div>
+
+                <form onsubmit="handleBuySubmit(event)" class="space-y-4">
+                    <div>
+                        <label for="modal-email" class="block text-sm font-medium text-gray-700 mb-1">電子郵件地址</label>
+                        <input type="email" id="modal-email" required placeholder="example@email.com"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all">
+                    </div>
+
+                    <div>
+                        <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">欲購買數量 (箱)</label>
+                        <select id="quantity"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all">
+                            <option value="1">1 箱 (24入)</option>
+                            <option value="2">2 箱 (48入) - 95折</option>
+                            <option value="5">5 箱以上 - 團購優惠</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" id="buy-submit-btn"
+                        class="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 mt-4">
+                        確認送出
+                    </button>
+
+                    <p class="text-xs text-center text-gray-400 mt-4">
+                        點擊送出即代表您同意接收原萃的相關行銷資訊。
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Original UI Logic (Icons, Scroll, Leaves, Products) -->
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Navbar Scroll Logic
+        const navbar = document.getElementById('navbar');
+        const brandText = document.getElementById('brand-text');
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-white/90', 'backdrop-blur-md', 'shadow-lg', 'py-3');
+                navbar.classList.remove('bg-transparent', 'py-5');
+                brandText.classList.remove('text-white');
+                brandText.classList.add('text-green-900');
+                menuBtn.classList.remove('text-white');
+                menuBtn.classList.add('text-gray-800');
+                navLinks.forEach(link => {
+                    link.classList.remove('text-white/90');
+                    link.classList.add('text-gray-600');
+                });
+            } else {
+                navbar.classList.remove('bg-white/90', 'backdrop-blur-md', 'shadow-lg', 'py-3');
+                navbar.classList.add('bg-transparent', 'py-5');
+                brandText.classList.add('text-white');
+                brandText.classList.remove('text-green-900');
+                menuBtn.classList.add('text-white');
+                menuBtn.classList.remove('text-gray-800');
+                navLinks.forEach(link => {
+                    link.classList.add('text-white/90');
+                    link.classList.remove('text-gray-600');
+                });
+            }
+        });
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+                mobileMenu.classList.add('hidden');
+            }
+        }
+
+        // Product Modal Logic
+        const products = {
+            'green-tea': {
+                title: '日式綠茶',
+                colorClass: 'bg-green-100',
+                icon: '🍵',
+                desc: '採用獨特「雲霧工法」，將茶葉細磨後融入茶湯，充分釋放茶葉的甘甜。100% 無香料，無糖，感受最真實的日式綠茶風味。'
+            },
+            'pouchong': {
+                title: '文山包種',
+                colorClass: 'bg-teal-100',
+                icon: '🌱',
+                desc: '嚴選文山包種茶，茶湯色澤蜜綠金黃，帶有優雅的花香，口感甘醇滑潤，清爽不苦澀。'
+            },
+            'black-tea': {
+                title: '錫蘭無糖紅茶',
+                colorClass: 'bg-red-100',
+                icon: '🍂',
+                desc: '精選斯里蘭卡高地紅茶，茶味濃郁香醇，口感層次豐富。無糖配方，更能品嚐紅茶原本的厚實口感與自然回甘。'
+            },
+            'tieguanyin': {
+                title: '鐵觀音',
+                colorClass: 'bg-amber-100',
+                icon: '🏺',
+                desc: '採用深度烘焙技術，茶湯呈現琥珀色，帶有獨特的弱果酸香氣與炭焙香，滋味醇厚回甘。'
+            }
+        };
+
+        const productModal = document.getElementById('product-modal');
+        const productModalContent = document.getElementById('product-modal-content');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDesc = document.getElementById('modal-desc');
+        const modalIcon = document.getElementById('modal-icon');
+        const modalColorBg = document.getElementById('modal-color-bg');
+
+        window.openProductModal = function (productId) {
+            const data = products[productId];
+            if (!data) return;
+
+            modalTitle.innerText = data.title;
+            modalDesc.innerText = data.desc;
+            modalIcon.innerText = data.icon;
+            modalColorBg.className = `md:w-2/5 h-64 md:h-auto flex items-center justify-center p-8 ${data.colorClass}`;
+
+            productModal.classList.remove('hidden');
+            setTimeout(() => {
+                productModalContent.classList.remove('scale-95', 'opacity-0');
+                productModalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        window.closeProductModal = function () {
+            productModalContent.classList.remove('scale-100', 'opacity-100');
+            productModalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                productModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        // Expose functions to window so HTML onclick/onsubmit works
+        window.handleHeroSubscribe = function (e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('hero-email');
+            const email = emailInput.value;
+            alert(`感謝您的訂閱！\n\n專屬 9 折優惠碼已發送至：${email}\n請查收您的信箱，立即享受真實茶韻。`);
+            emailInput.value = '';
+        };
+
+        window.handleBuySubmit = function (e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('modal-email');
+            const quantityInput = document.getElementById('quantity');
+
+            const email = emailInput.value;
+            const quantity = quantityInput.value;
+
+            alert(`訂單已送出！\n\nEmail: ${email}\n數量: ${quantity} 箱\n\n我們的業務代表將盡快與您聯繫。`);
+            closeBuyModal();
+            emailInput.value = '';
+        };
+
+        // Make close functions global for HTML access
+        window.closeBuyModal = function () {
+            const buyModal = document.getElementById('buy-modal');
+            const buyModalContent = document.getElementById('buy-modal-content');
+            buyModalContent.classList.remove('scale-100', 'opacity-100');
+            buyModalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                buyModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        window.openBuyModal = function () {
+            const buyModal = document.getElementById('buy-modal');
+            const buyModalContent = document.getElementById('buy-modal-content');
+            buyModal.classList.remove('hidden');
+            setTimeout(() => {
+                buyModalContent.classList.remove('scale-95', 'opacity-0');
+                buyModalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Visual Effects
+        const leavesContainer = document.getElementById('leaves-container');
+        for (let i = 0; i < 10; i++) {
+            const leaf = document.createElement('div');
+            leaf.classList.add('absolute', 'animate-float');
+            leaf.innerText = '🍃';
+            leaf.style.left = `${Math.random() * 100}%`;
+            leaf.style.top = `${Math.random() * 100}%`;
+            leaf.style.animationDuration = `${10 + Math.random() * 20}s`;
+            leaf.style.animationDelay = `${Math.random() * 5}s`;
+            leaf.style.fontSize = `${20 + Math.random() * 40}px`;
+            leavesContainer.appendChild(leaf);
+        }
+
+        const particlesContainer = document.getElementById('particles-container');
+        for (let i = 0; i < 20; i++) {
+            const dot = document.createElement('div');
+            dot.classList.add('absolute', 'bg-green-900', 'rounded-full', 'opacity-0', 'group-hover:opacity-60', 'group-hover:animate-float-fast');
+            dot.style.width = Math.random() * 6 + 'px';
+            dot.style.height = Math.random() * 6 + 'px';
+            dot.style.left = Math.random() * 100 + '%';
+            dot.style.bottom = '0';
+            dot.style.animationDelay = Math.random() * 0.5 + 's';
+            particlesContainer.appendChild(dot);
+        }
+    </script>
+</body>
+
+</html>
